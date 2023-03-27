@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" contenxt="width=device-width, initial-scale=1.0">
+    <script type='text/javascript' src='//www.midijs.net/lib/midi.js'></script>
+    <title>Chord Progression Generator</title>
+</head>
+
+<body>
+    <h1>Chord Progression Generator</h1>
+    <label for="key">Key:</label>
+    <input type="text" id="key" name="key" value="C">
+    <button onclick="generateChords()">Generate</button>
+    <input type="range" id="volume" min="0" max="100" value="50" onchange="setVolume()" />
+    <label for="volume">Volume</label>
+    <button id="stop" onclick="stopPlayback()">Stop</button>
+
+    <script>
+        async function generateChords() {
+            const key = document.getElementById("key").value;
+            console.log('Key: ', key);
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ key })
+            });
+
+            const data = await response.json();
+            console.log('Received data: ', data);
+
+            const midiData = new Uint8Array(data.midi_data.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            console.log('MIDI data: ', midiData);
+
+            const blob = new Blob([midiData], { type: 'audio/midi' });
+            const url = URL.createObjectURL(blob);
+            console.log('URL: ', url);
+
+            MIDIjs.play(url);
+        }
+
+        function setVolume() {
+            const volumeControl = document.getElementById("volume");
+            const volume = volumeControl.value / 100;
+            MIDIjs.setVolume(0, volume * 127);
+        }
+
+        function stopPlayback() {
+            MIDIjs.stop();
+        }
+
+    </script>
+</body>
+
+</html>

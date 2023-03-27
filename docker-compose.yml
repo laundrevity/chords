@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  box:
+    build: .
+    volumes:
+      - .:/app
+    command: sleep infinity
+    ports:
+      - "5000:5000"
