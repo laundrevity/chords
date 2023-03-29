@@ -10,15 +10,28 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate_chord_progression():
-    key_str = request.json.get('key', 'C')
-    key_obj = key.Key(key_str)
-    progression = chord_progression.generate_chord_progression(key_obj)
-    chord_progression.save_chord_progression_to_midi(progression, "out.midi")
+    try:
+        data = request.json
+        key_input = data['key']
+        progression = data['progression']
+        time_signature = data['time_signature']
+        melody_style = data['melody_style']
+        melody_notes_per_chord = int(data['melody_notes_per_chord'])
+        
+        key_obj = key.Key(key_input)
+        progression = chord_progression.generate_chord_progression(key_obj, progression)
+        chord_progression.save_chord_progression_to_midi(progression, time_signature, melody_style, melody_notes_per_chord, "out.midi")
+        print('saved chord progression')
 
-    with open("out.midi", "rb") as f:
-        midi_data = f.read()
+        with open("out.midi", "rb") as f:
+            midi_data = f.read()
 
-    return jsonify({"midi_data": midi_data.hex()})
+        return jsonify({
+            "success": True, "midi_data": midi_data.hex()})
+
+    except Exception as e:
+        print(f"got error: {e} when handling {request=}")
+        return jsonify({"success": False})
 
 
 if __name__ == '__main__':
