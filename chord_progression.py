@@ -25,6 +25,10 @@ def generate_chord_progression(key: key.Key, progression: str) -> List[chord.Cho
     I = chord.Chord([scale.pitchFromDegree(1), scale.pitchFromDegree(3), scale.pitchFromDegree(5)])
     IV = chord.Chord([scale.pitchFromDegree(4), scale.pitchFromDegree(6), scale.pitchFromDegree(1).transpose(7)])
     V = chord.Chord([scale.pitchFromDegree(5), scale.pitchFromDegree(7), scale.pitchFromDegree(2).transpose(7)])
+    vi = chord.Chord([scale.pitchFromDegree(6), scale.pitchFromDegree(1).transpose(7), scale.pitchFromDegree(3).transpose(7)])
+    viio = chord.Chord([scale.pitchFromDegree(7), scale.pitchFromDegree(2).transpose(7), scale.pitchFromDegree(4).transpose(7)])
+    iii = chord.Chord([scale.pitchFromDegree(3), scale.pitchFromDegree(5), scale.pitchFromDegree(7)])
+    ii = chord.Chord([scale.pitchFromDegree(2), scale.pitchFromDegree(4), scale.pitchFromDegree(6)])
 
     chord_progression = []
     for s in progression.split('-'):
@@ -35,6 +39,14 @@ def generate_chord_progression(key: key.Key, progression: str) -> List[chord.Cho
                 chord_progression.append(IV)
             case "V":
                 chord_progression.append(V)
+            case "vi":
+                chord_progression.append(vi)
+            case "viio":
+                chord_progression.append(viio)
+            case "iii":
+                chord_progression.append(iii)
+            case "ii":
+                chord_progression.append(ii)
     return chord_progression
 
 def save_chord_progression_to_midi(chord_progression: List[chord.Chord], time_signature: str, melody_style: str, melody_notes_per_chord: int, filename: str):
