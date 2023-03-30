@@ -20,14 +20,14 @@ def generate_chord_progression():
         
         key_obj = key.Key(key_input)
         progression = chord_progression.generate_chord_progression(key_obj, progression)
-        chord_progression.save_chord_progression_to_midi(progression, time_signature, melody_style, melody_notes_per_chord, "out.midi")
+        duration = chord_progression.save_chord_progression_to_midi(progression, time_signature, melody_style, melody_notes_per_chord, "out.midi")
         print('saved chord progression')
 
         with open("out.midi", "rb") as f:
             midi_data = f.read()
 
         return jsonify({
-            "success": True, "midi_data": midi_data.hex()})
+            "success": True, "midi_data": midi_data.hex(), "duration": duration})
 
     except Exception as e:
         print(f"got error: {e} when handling {request=}")

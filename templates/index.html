@@ -78,6 +78,7 @@
                 <option value="arpeggio">arpeggio</option>
                 <option value="motif">motif</option>
                 <option value="jumps">jumps</option>
+                <option value="sequence">sequence</option>
             </select>
         </div>
         <div class="form-group">
@@ -86,7 +87,7 @@
         </div>
         <div class="form-group">
             <button onclick="generateChords(event)">Play</button>
-            <button id="stop" onclick="stopPlayback()">Stop</button>
+            <button id="stop" onclick="stopPlayback(event)">Stop</button>
         </div>
     </form>
     <!-- <label for="key">Key:</label>
@@ -121,6 +122,8 @@
     <button id="stop" onclick="stopPlayback()">Stop</button> -->
 
     <script>
+        let keepPlaying = true;
+
         async function generateChords(event) {
             // prevent form submission
             event.preventDefault();
@@ -158,7 +161,19 @@
                 const url = URL.createObjectURL(blob);
                 console.log('URL: ', url);
 
-                MIDIjs.play(url);
+                const playAndScheduleNext = () => {
+                    if (keepPlaying) {
+                        MIDIjs.play(url);
+                        const duration = data.duration * 1000;
+                        setTimeout(playAndScheduleNext, duration);
+                    }
+                }
+
+                keepPlaying = true;
+                playAndScheduleNext();
+                // MIDIjs.play(url);
+                // MIDIjs.player.setUrl(url);
+
             } else {
                 console.log('unsuccessful');
             }
@@ -171,7 +186,9 @@
             MIDIjs.setVolume(0, volume * 127);
         }
 
-        function stopPlayback() {
+        function stopPlayback(event) {
+            event.preventDefault();
+            keepPlaying = false;
             MIDIjs.stop();
         }
 

@@ -49,11 +49,17 @@ def generate_chord_progression(key: key.Key, progression: str) -> List[chord.Cho
                 chord_progression.append(ii)
     return chord_progression
 
-def save_chord_progression_to_midi(chord_progression: List[chord.Chord], time_signature: str, melody_style: str, melody_notes_per_chord: int, filename: str):
+def save_chord_progression_to_midi(
+    chord_progression: List[chord.Chord], 
+    time_signature: str, 
+    melody_style: str, 
+    melody_notes_per_chord: int, 
+    filename: str) -> float:
     num, denom = map(int, time_signature.split('/'))
     midi = MIDIFile(2)
-    midi.addTempo(0, 0, 120)
-    midi.addTempo(1, 0, 120)
+    tempo_bpm = 120
+    midi.addTempo(0, 0, tempo_bpm)
+    midi.addTempo(1, 0, tempo_bpm)
 
     # calculate the power of 2 for the denominator
     denom_power_of_two = int(math.log2(denom))
@@ -62,8 +68,10 @@ def save_chord_progression_to_midi(chord_progression: List[chord.Chord], time_si
     midi.addTimeSignature(0, 0, num, denom_power_of_two, 24, 8)
     midi.addTimeSignature(1, 0, num, denom_power_of_two, 24, 8)
 
-    silence_duration = 0.5  # Add 0.5 seconds of silence before the first chord
+    silence_duration = 0.0  # Add 0.5 seconds of silence before the first chord
     chord_duration = num  # Change the chord duration based on the time signature
+    # chord_duration = 1
+
 
     # melody settings
     # melody_notes_per_chord = 8
@@ -110,6 +118,13 @@ def save_chord_progression_to_midi(chord_progression: List[chord.Chord], time_si
                 pentatonic_scale = major_pentatonic_scale(ch.root().name)
                 melody_notes = [pentatonic_scale[(t * interval) % len(pentatonic_scale)] for t in range(melody_notes_per_chord)]
                 octaves = [ch.pitches[0].octave + (k // len(melody_notes)) for k in range(melody_notes_per_chord)]
+            case "sequence":
+                pentatonic_scale = major_pentatonic_scale(ch.root().name)
+                motif = [0, 2, 4]  # Define a short motif using scale degrees
+                transpositions = [0, 2, -2]  # Define a list of transpositions for the motif
+                melody_notes = [pentatonic_scale[(i + t) % len(pentatonic_scale)] for t in transpositions for i in motif]
+                octaves = [ch.pitches[0].octave + (k // len(melody_notes)) for k in range(melody_notes_per_chord)]
+
 
         print(f"Got melody_notes: {melody_notes}")
         if melody_notes:
@@ -127,6 +142,13 @@ def save_chord_progression_to_midi(chord_progression: List[chord.Chord], time_si
         except Exception as e:
             print(f"got error writing midi: {e}")
             print(traceback.format_exc())
+
+    # duration = (chord_duration * len(chord_progression) + silence_duration) * (tempo_bpm / 60) / denom
+    total_beats = num * len(chord_progression)
+    beat_duration = 60 / tempo_bpm
+    duration = (total_beats * beat_duration) + silence_duration
+    return duration
+
 
 if __name__ == '__main__':
     key_c = key.Key('C')
