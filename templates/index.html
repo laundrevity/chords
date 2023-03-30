@@ -6,11 +6,90 @@
     <meta name="viewport" contenxt="width=device-width, initial-scale=1.0">
     <script type='text/javascript' src='//www.midijs.net/lib/midi.js'></script>
     <title>Chord Progression Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+        }
+
+        button {
+            width: 150px;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Chord Progression Generator</h1>
-    <label for="key">Key:</label>
+    <form>
+        <div class="form-group">
+            <label for="key">Key:</label>
+            <input type="text" id="key" name="key" value="C">
+        </div>
+        <div class="form-group">
+            <label for="progression">Progression:</label>
+            <select id="progression">
+                <option value="I-IV-V-IV">I - IV - V - IV</option>
+                <option value="I-I-IV-V">I - I - IV - V</option>
+                <option value="I-IV-I-V">I - IV - I - V</option>
+                <option value="I-IV-V-V">I - IV - V - V</option>
+                <option value="I-IV-viio-iii-vi-ii-V-I">I - IV - viio - iii - vi - ii - V - I (circle progression)
+                </option>
+                <option value="I-vi-IV-V">I - vi - IV - V (50s progression / doo-wop progression)</option>
+                <option value="I-vi-ii-V">I - vi - ii - V (50s progression / doo-wop progression alternative)</option>
+                <option value="I-I-I-I-IV-IV-I-I-V-IV-I-I">12 bar blues</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="time_signature">Time signature:</label>
+            <select id="time_signature">
+                <option value="4/4">4/4</option>
+                <option value="3/4">3/4</option>
+                <option value="6/8">6/8</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="melody_style">Melody style:</label>
+            <select id="melody_style">
+                <option value="none">none</option>
+                <option value="ascending">ascending</option>
+                <option value="descending">descending</option>
+                <option value="alternating">alternating</option>
+                <option value="arpeggio">arpeggio</option>
+                <option value="motif">motif</option>
+                <option value="jumps">jumps</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="melody_notes_per_chord">Melody notes per chord:</label>
+            <input type="text" id="melody_notes_per_chord" name="melody_notes_per_chord" value="4">
+        </div>
+        <div class="form-group">
+            <button onclick="generateChords(event)">Play</button>
+            <button id="stop" onclick="stopPlayback()">Stop</button>
+        </div>
+    </form>
+    <!-- <label for="key">Key:</label>
     <input type="text" id="key" name="key" value="C">
     <select id="progression">
         <option value="I-IV-V-IV">I - IV - V - IV</option>
@@ -39,10 +118,12 @@
     <label for="melody_notes_per_chord">#melody notes per chord:</label>
     <input type="text" id="melody_notes_per_chord" name="melody_notes_per_chord" value="4">
     <button onclick="generateChords()">Generate</button>
-    <button id="stop" onclick="stopPlayback()">Stop</button>
+    <button id="stop" onclick="stopPlayback()">Stop</button> -->
 
     <script>
-        async function generateChords() {
+        async function generateChords(event) {
+            // prevent form submission
+            event.preventDefault();
             const key = document.getElementById("key").value;
             const progression = document.getElementById("progression").value;
             const time_signature = document.getElementById("time_signature").value;
